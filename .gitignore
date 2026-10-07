@@ -1,9 +1,13 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
 *.pyo
+.pytest_cache/
+.mypy_cache/
 
-# Virtual Environment
+# Virtual Environments
 .venv/
 venv/
 env/
@@ -12,54 +16,49 @@ env/
 .env
 .env.*
 
+# =========================
 # Jupyter
+# =========================
 .ipynb_checkpoints/
 
+# =========================
 # VS Code
+# =========================
 .vscode/
 
+# =========================
 # Streamlit
+# =========================
 .streamlit/secrets.toml
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Python cache
-.pytest_cache/
-.mypy_cache/
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-
-# Build files
+# =========================
+# Build & Distribution
+# =========================
 build/
 dist/
 *.egg-info/
 
-# Android
-android-app/.gradle/
-android-app/build/
-android-app/app/build/
-android-app/.idea/
-android-app/local.properties
-android-app/*.iml
+# =========================
+# Logs & Temporary Files
+# =========================
+*.log
+*.tmp
+*.temp
 
-
+# =========================
 # Android / Gradle
+# =========================
 .gradle/
 .gradle-user/
 **/.gradle/
 **/.gradle-user/
-
-# Build files
-build/
 **/build/
-
-# Android Studio
 .idea/
 *.iml
+local.properties
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
