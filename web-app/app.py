@@ -90,7 +90,7 @@ if st.button(
     try:
 
         response = requests.post(
-            "http://127.0.0.1:8000/predict",
+            "http://3.110.155.47:8000/predict",
             json=data
         )
 
