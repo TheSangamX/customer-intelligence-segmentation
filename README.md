@@ -1,224 +1,468 @@
-# Customer Intelligence & Segmentation
+# 🧠 Customer Intelligence & Segmentation
 
-An end-to-end customer segmentation project that turns transaction records into customer-level Recency, Frequency and Monetary (RFM) features, assigns a K-Means segment, and returns the result through a FastAPI service. The project includes a Jupyter notebook for the analysis, a Streamlit web app, and a Kotlin Android app.
+> An end-to-end unsupervised machine learning application that analyzes customer behavior using RFM analysis and K-Means clustering, then serves customer segments through FastAPI, Streamlit, and a native Android application.
 
-## Project overview
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?logo=fastapi)
+![Streamlit](https://img.shields.io/badge/Streamlit-Web%20App-FF4B4B?logo=streamlit)
+![Kotlin](https://img.shields.io/badge/Kotlin-Android-7F52FF?logo=kotlin)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-UI-4285F4)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn)
+![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?logo=amazonaws)
+![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)
 
-RFM analysis summarizes customer behavior using three measures:
+---
 
-| Measure | Meaning | Typical interpretation |
-| --- | --- | --- |
-| **Recency** | Days since the customer's most recent purchase | Lower values mean a more recent purchase. |
-| **Frequency** | Number of transaction records associated with the customer | Higher values indicate more purchase activity. |
-| **Monetary** | Sum of the customer's transaction amounts | Higher values indicate greater recorded spending. |
+## 📌 Overview
 
-The notebook aggregates these measures by customer, scales the three features, and fits a three-cluster K-Means model. FastAPI loads the saved scaler, K-Means model, and cluster-name mapping to classify new RFM values. Streamlit and Android provide user interfaces for submitting values and reading the prediction.
+**Customer Intelligence & Segmentation** is an end-to-end machine learning project built to understand the complete journey from **transaction data and exploratory analysis to customer segmentation, API serving, cloud deployment, web integration, and Android integration**.
 
-## Features
+The project includes:
 
-- Customer-level RFM feature engineering from transaction data.
-- Scaled RFM features and K-Means clustering.
-- Named customer segments with explanatory insights and business recommendations in the Streamlit app.
-- Streamlit RFM summary table and bar chart for a submitted customer.
-- FastAPI prediction endpoint shared by the web and Android clients.
-- Android Compose interface with inline RFM validation, loading and network-error states, segment details, and an RFM summary.
-- Android Settings/About screen with a saved Dark Mode preference and developer information.
-- Android launcher icon resources.
-- Notebook exploration of clustering alternatives, silhouette scores, and PCA visualizations.
+- 🧠 RFM feature engineering
+- 🎯 K-Means clustering as the main production model
+- 🌳 Hierarchical Clustering comparison with dendrogram analysis
+- 🔵 DBSCAN analysis for density-based clustering and noise detection
+- 📉 PCA for dimensionality reduction and visualization
+- 📊 Silhouette Score for cluster evaluation
+- ⚡ FastAPI REST API
+- 🌐 Streamlit Web Application
+- 📱 Native Android Application using Kotlin and Jetpack Compose
+- ☁️ AWS EC2 deployment
+- 🔄 systemd service for persistent backend execution
 
-## Machine learning workflow
+Both Streamlit and Android communicate with the same FastAPI prediction backend.
+
+---
+
+# 🚀 Live Applications & Resources
+
+| Resource | Link |
+|---|---|
+| 🌐 Streamlit Web Application | https://customer-intelligence-segmentation.streamlit.app/ |
+| 💻 Source Code | https://github.com/TheSangamX/customer-intelligence-segmentation |
+| 🧪 FastAPI Swagger API | http://3.110.155.47:8000/docs |
+
+> **Note:** The current backend uses a public HTTP endpoint for deployment/testing. HTTPS and a custom domain are future production-hardening improvements.
+
+---
+
+# 🧭 Table of Contents
+
+- [Project Objective](#-project-objective)
+- [End-to-End Workflow](#-end-to-end-workflow)
+- [Key Features](#-key-features)
+- [RFM Analysis](#-rfm-analysis)
+- [Machine Learning Workflow](#-machine-learning-workflow)
+- [Clustering Algorithms](#-clustering-algorithms)
+- [Customer Segments](#-customer-segments)
+- [Technology Stack](#-technology-stack)
+- [System Architecture](#-system-architecture)
+- [API Reference](#-api-reference)
+- [Repository Structure](#-repository-structure)
+- [Android Application](#-android-application)
+- [Getting Started](#-getting-started)
+- [Deployment](#-deployment)
+- [Project Status](#-project-status)
+- [Future Improvements](#-future-improvements)
+- [Disclaimer](#️-disclaimer)
+- [Developer](#-developer)
+
+---
+
+# 🎯 Project Objective
+
+The objective was not only to build a clustering model, but to understand how an **unsupervised machine learning workflow can become a usable application**.
 
 ```text
-Transaction CSV
+Transaction Data
       ↓
-Data checks, cleaning, and exploratory analysis
+Exploratory Data Analysis
       ↓
-Customer-level RFM feature engineering
+Data Cleaning
       ↓
-StandardScaler feature scaling
+RFM Feature Engineering
       ↓
-K-Means clustering (3 clusters)
+Feature Scaling
       ↓
-Cluster profiling and segment interpretation
+K-Means Clustering
       ↓
-Save scaler, K-Means model, and segment-name mapping
+Cluster Evaluation
       ↓
-FastAPI prediction endpoint
-      ├── Streamlit web app
-      └── Android app
+Business Segment Interpretation
+      ↓
+Model Serialization
+      ↓
+FastAPI REST API
+      ↓
+AWS EC2 Deployment
+      ↓
+Streamlit Web Application
+      ↓
+Native Android Application
 ```
 
-The notebook also explores the elbow method with Kneed, Agglomerative (hierarchical) clustering, DBSCAN, silhouette-score comparisons, and two-component PCA visualizations. These are analysis steps in the notebook; the deployed prediction endpoint uses the saved K-Means model.
+> **Machine Learning + Customer Analytics + API Development + Cloud Deployment + Web Development + Android Development**
 
-## Model and segment labels
+---
 
-The saved K-Means model uses three RFM features after `StandardScaler` transformation. The current notebook fits K-Means with three clusters, `random_state=42`, and `n_init=10`.
-
-The checked-in segment mapping is:
-
-| Cluster | Segment | Business interpretation |
-| --- | --- | --- |
-| 0 | **High-Value / Loyal** | Strong purchasing activity and monetary value; focus on retention, loyalty programs, premium offers, and personalized rewards. |
-| 1 | **Inactive / Low-Value** | Lower purchasing activity; consider reactivation campaigns, targeted offers, and limited-time discounts. |
-| 2 | **Regular / Mid-Value** | Moderate purchase activity and spending; use personalized promotions and cross-selling to encourage engagement. |
-
-These labels are interpretations attached to the fitted cluster IDs in `models/segment_names.joblib`; they are not supervised target classes.
-
-## Project structure
+# 🔄 End-to-End Workflow
 
 ```text
-.
-├── android-app/
-│   ├── app/src/main/java/com/sangamgupta/customerintelligence/
-│   │   ├── ApiClient.kt
-│   │   ├── ApiService.kt
-│   │   ├── CustomerData.kt
-│   │   ├── MainActivity.kt
-│   │   ├── PredictionResponse.kt
-│   │   ├── SettingsScreen.kt
-│   │   └── ui/theme/
-│   ├── app/src/main/AndroidManifest.xml
-│   ├── app/src/main/res/             # App icon and Android resources
-│   ├── app/build.gradle.kts
-│   ├── gradle/libs.versions.toml
-│   └── gradlew / gradlew.bat
-├── backend/
-│   ├── main.py                       # FastAPI application and /predict route
-│   └── schemas.py                    # Pydantic request/response models
-├── data/
-│   └── customer_transactions.csv
-├── models/
-│   ├── kmeans_model.joblib
-│   ├── scaler.joblib
-│   └── segment_names.joblib
-├── notebook/
-│   └── customer_segmentation.ipynb   # Data analysis and model workflow
-├── web-app/
-│   └── app.py                        # Streamlit client
-├── requirements.txt
-└── README.md
+                    ┌──────────────────────┐
+                    │ Transaction Dataset  │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ EDA & Data Cleaning  │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ RFM Feature          │
+                    │ Engineering          │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ StandardScaler       │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ K-Means Clustering   │
+                    │ Main Model           │
+                    └──────────┬───────────┘
+                               ↓
+          ┌────────────────────┼────────────────────┐
+          ↓                    ↓                    ↓
+   Hierarchical             DBSCAN                 PCA
+   Comparison               Analysis           Visualization
+          └────────────────────┼────────────────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ Evaluation &         │
+                    │ Business Insights    │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ FastAPI REST API     │
+                    │ POST /predict        │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────┴──────────┐
+                    ↓                     ↓
+              Streamlit Web         Android App
 ```
 
-## Technology
+---
 
-- **Data and machine learning:** Python, Pandas, NumPy, scikit-learn, SciPy, Kneed, Joblib, Matplotlib
-- **API:** FastAPI, Pydantic, Uvicorn, Requests
-- **Web interface:** Streamlit
-- **Android:** Kotlin, Jetpack Compose, Material 3, Retrofit, Gson, Gradle
-- **Version control:** Git
+# ✨ Key Features
 
-## Setup
+## 🤖 Machine Learning
 
-### 1. Clone the repository
+- RFM-based customer feature engineering.
+- Customer-level behavioral segmentation.
+- K-Means as the main production clustering algorithm.
+- Elbow/knee analysis for selecting a candidate K.
+- KneeLocator integration.
+- Silhouette Score for cluster evaluation.
+- Hierarchical Clustering comparison.
+- Dendrogram visualization.
+- DBSCAN analysis and noise detection.
+- PCA for dimensionality reduction and visualization.
+- StandardScaler for distance-based clustering.
+- Business-friendly segment labels.
+- Saved model/scaler artifacts for API inference.
 
-```bash
-git clone <repository-url>
-cd customer-intelligence-segmentation
+## ⚡ FastAPI REST API
+
+- `GET /` health/status endpoint.
+- `POST /predict` prediction endpoint.
+- Pydantic request validation.
+- JSON request/response handling.
+- Saved ML artifact loading.
+- Uvicorn ASGI server.
+- Swagger/OpenAPI documentation.
+- AWS EC2 deployment.
+- systemd service.
+
+## 🌐 Streamlit Web Application
+
+The Streamlit application accepts **Recency, Frequency, and Monetary** values, calls the deployed FastAPI backend, and displays:
+
+- Customer cluster
+- Customer segment
+- RFM summary
+- Segment insights
+- Business recommendation
+- RFM visualization
+
+## 📱 Android Application
+
+The native Android application provides:
+
+- RFM input form
+- Customer segment prediction
+- Segment insights
+- Business recommendation
+- Loading state
+- API error handling
+- Settings screen
+- Dark Mode
+- Developer/contact information
+- Website and version information
+- Custom app icon
+
+The Android application does **not** run the ML model locally. It communicates with the deployed FastAPI backend.
+
+---
+
+# 📊 RFM Analysis
+
+RFM converts transaction-level behavior into customer-level features.
+
+| Metric | Meaning | General Interpretation |
+|---|---|---|
+| **Recency** | Days since the latest purchase | Lower is generally better |
+| **Frequency** | Number of purchases | Higher generally indicates stronger engagement |
+| **Monetary** | Total customer spending | Higher indicates greater monetary value |
+
+```text
+Transaction Data
+      ↓
+CustomerID + InvoiceDate + TotalAmount
+      ↓
+RFM Aggregation
+      ↓
+Recency + Frequency + Monetary
+      ↓
+Customer-Level Dataset
 ```
 
-Replace `<repository-url>` with the URL of your Git repository.
+These features are scaled before distance-based clustering.
 
-### 2. Create a Python environment and install dependencies
+---
 
-```bash
-python -m venv .venv
+# 🧠 Machine Learning Workflow
+
+## 1. Exploratory Data Analysis
+
+The transaction dataset was explored for:
+
+- Structure and data types
+- Missing values
+- Duplicate records
+- Numerical distributions
+- Categorical distributions
+- Customer counts
+- Transaction dates
+- Spending behavior
+- Outliers and data quality
+
+## 2. Data Cleaning
+
+Cleaning includes:
+
+- Converting `InvoiceDate` to datetime.
+- Handling missing categorical values.
+- Removing duplicate transaction records.
+- Checking data types and numerical values.
+
+## 3. RFM Feature Engineering
+
+Transaction-level records are aggregated by customer to calculate Recency, Frequency, and Monetary values.
+
+## 4. Feature Scaling
+
+```python
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 ```
 
-Activate it, then install the pinned project requirements:
+Scaling is important because clustering algorithms based on distance can otherwise be dominated by features with larger numerical ranges.
 
-```powershell
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
+## 5. K-Means Clustering
+
+K-Means is the main clustering model used by the deployed prediction service.
+
+```text
+Choose K
+   ↓
+Initialize Centroids
+   ↓
+Assign Customers
+   ↓
+Recalculate Centroids
+   ↓
+Repeat Until Convergence
+   ↓
+Customer Clusters
 ```
 
-```bash
-# macOS / Linux
-source .venv/bin/activate
+### K Selection
+
+The project evaluates inertia across different K values and uses `KneeLocator` to identify a candidate elbow:
+
+```python
+from kneed import KneeLocator
+
+kl = KneeLocator(
+    range(1, 10),
+    inertia,
+    curve="convex",
+    direction="decreasing"
+)
+
+optimal_k = kl.elbow
 ```
 
-```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+## 6. Cluster Evaluation
+
+Silhouette Score is used to evaluate cluster compactness and separation. It is treated as an evaluation signal rather than a universal pass/fail threshold.
+
+---
+
+# 🎯 Clustering Algorithms
+
+## K-Means
+
+The main production algorithm. It groups customers around learned centroids and requires a chosen number of clusters.
+
+**Key concept:** Centroid 🎯
+
+## Hierarchical Clustering
+
+Agglomerative clustering is used for comparison. It starts with individual points and progressively merges clusters. A dendrogram visualizes the merge hierarchy.
+
+**Key concept:** Dendrogram 🌳
+
+## DBSCAN
+
+A density-based method explored for irregular cluster structures and noise/outlier detection.
+
+**Key concepts:** Core, Border, Noise (`-1`) 🔵🟡🔴
+
+## PCA
+
+Used for dimensionality reduction and visualization of the customer feature space. PCA is not the production prediction algorithm.
+
+---
+
+# 👥 Customer Segments
+
+The generated clusters are interpreted using business-friendly segment labels.
+
+### 💎 High-Value / Loyal
+
+Strong purchasing activity and high monetary value.
+
+**Recommendation:** retention, loyalty programs, premium offers, and personalized rewards.
+
+### 📈 Regular / Mid-Value
+
+Moderate purchasing activity and spending behavior.
+
+**Recommendation:** personalized promotions, cross-selling, and engagement strategies.
+
+### 💤 Inactive / Low-Value
+
+Relatively low purchasing activity and/or lower monetary value.
+
+**Recommendation:** re-engagement campaigns, targeted offers, and reactivation strategies.
+
+> Segment names are business interpretations of the generated clusters and should be validated against the underlying customer behavior.
+
+---
+
+# 🛠️ Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Programming | Python |
+| Data Analysis | Pandas |
+| Numerical Computing | NumPy |
+| Machine Learning | scikit-learn |
+| Main Clustering | K-Means |
+| Comparison Clustering | Hierarchical, DBSCAN |
+| Dimensionality Reduction | PCA |
+| Evaluation | Silhouette Score |
+| K Selection | KneeLocator |
+| Serialization | Joblib |
+| Backend | FastAPI |
+| API Server | Uvicorn |
+| Validation | Pydantic |
+| Web App | Streamlit |
+| HTTP Client | Requests |
+| Visualization | Matplotlib |
+| Android | Kotlin + Jetpack Compose |
+| Cloud | AWS EC2 |
+| Server OS | Ubuntu |
+| Service Manager | systemd |
+| Version Control | Git + GitHub |
+
+---
+
+# 🏗️ System Architecture
+
+```text
+                              ┌────────────────────┐
+                              │       User         │
+                              └─────────┬──────────┘
+                                        │
+                         ┌──────────────┴──────────────┐
+                         ↓                             ↓
+              ┌─────────────────────┐       ┌─────────────────────┐
+              │ Streamlit Web App   │       │ Native Android App  │
+              └──────────┬──────────┘       └──────────┬──────────┘
+                         │                             │
+                         └──────────────┬──────────────┘
+                                        ↓
+                              ┌─────────────────────┐
+                              │    FastAPI Backend  │
+                              │      POST /predict  │
+                              └──────────┬──────────┘
+                                         ↓
+                              ┌─────────────────────┐
+                              │ RFM Processing +    │
+                              │ Saved ML Artifacts  │
+                              └──────────┬──────────┘
+                                         ↓
+                              ┌─────────────────────┐
+                              │   K-Means Model     │
+                              └──────────┬──────────┘
+                                         ↓
+                              ┌─────────────────────┐
+                              │ Customer Segment    │
+                              └─────────────────────┘
 ```
 
-### 3. Start the FastAPI backend
+---
 
-Run from the repository root. The backend loads the model files from the relative `models/` directory.
+# ⚙️ API Reference
 
-```bash
-uvicorn backend.main:app --reload
+## `GET /`
+
+Checks whether the API is running.
+
+```text
+http://3.110.155.47:8000/
 ```
 
-The API is available at `http://127.0.0.1:8000`. Interactive API documentation is at `http://127.0.0.1:8000/docs`.
+## `POST /predict`
 
-### 4. Start the Streamlit app
+Accepts RFM information and returns a cluster and business segment.
 
-Keep FastAPI running, open another terminal at the repository root, activate the same Python environment, and run:
-
-```bash
-streamlit run web-app/app.py
-```
-
-The Streamlit client sends requests to `http://127.0.0.1:8000/predict`, so it expects the API to be running on the same computer at that address.
-
-### 5. Open or build the Android app
-
-Open the `android-app/` directory in Android Studio and let Gradle sync. The command-line debug build is:
-
-```powershell
-# Windows
-cd android-app
-.\gradlew.bat assembleDebug
-```
-
-```bash
-# macOS / Linux
-cd android-app
-./gradlew assembleDebug
-```
-
-The debug APK is written to `android-app/app/build/outputs/apk/debug/app-debug.apk`.
-
-The Android API URL is configurable with the Gradle property `API_BASE_URL`. The current default is `http://192.168.0.112:8000/`, which reflects the development PC's LAN address when this project was configured. For a physical phone, run FastAPI with a LAN-accessible bind address and build with the PC's current IPv4 address:
-
-```bash
-uvicorn backend.main:app --host 0.0.0.0 --port 8000
-```
-
-```powershell
-# Example only: replace the address with the PC's current LAN IPv4 address.
-.\gradlew.bat assembleDebug -PAPI_BASE_URL=http://192.168.1.25:8000/
-```
-
-Connect the phone and PC to the same network and allow inbound port 8000 through the PC firewall if needed. For an Android Emulator, use its host alias instead:
-
-```bash
-./gradlew assembleDebug -PAPI_BASE_URL=http://10.0.2.2:8000/
-```
-
-The app uses cleartext HTTP for local development. Use an appropriately secured HTTPS endpoint for a hosted deployment.
-
-## API
-
-### `GET /`
-
-Returns a short message confirming that the API process is running.
-
-### `POST /predict`
-
-The request body is validated against the `CustomerData` Pydantic schema. The API applies the saved scaler, predicts the K-Means cluster, and maps that cluster to its saved segment name.
-
-**Request**
+### Example Request
 
 ```json
 {
-  "recency": 10,
-  "frequency": 11,
-  "monetary": 10000
+  "recency": 30,
+  "frequency": 10,
+  "monetary": 50000
 }
 ```
 
-**Response**
+### Example Response
 
 ```json
 {
@@ -227,55 +471,340 @@ The request body is validated against the `CustomerData` Pydantic schema. The AP
 }
 ```
 
-The values above are an example request and response for the checked-in model. The request schema represents the RFM values as numbers; the FastAPI schema does not currently enforce the UI's business ranges.
+> Exact results depend on the trained clustering artifacts and submitted values.
 
-## Applications
+### Swagger
 
-### Streamlit
+```text
+http://3.110.155.47:8000/docs
+```
 
-The web app provides numeric inputs for recency, frequency, and monetary value, submits them to FastAPI, and displays the returned cluster and segment. It also presents the submitted RFM values in a summary table, a bar chart, and a segment-specific insight and recommendation. Its input widgets currently constrain recency to 0–1,000, frequency to 1–1,000, and monetary value to 0–10,000,000.
+---
 
-### Android
+# 📂 Repository Structure
 
-The Android client is written in Kotlin with Jetpack Compose and Material 3. It sends requests through Retrofit with Gson serialization. It provides inline input errors and does not submit invalid values: recency must be an integer from 1 to 3,650 days, frequency an integer from 1 to 1,000 purchases, and monetary value greater than 0 and no more than 10,000,000. The result screen shows the API-returned segment and cluster, the RFM summary, segment insights, and a recommendation. Settings includes a persistent Dark Mode toggle and project/developer details.
+```text
+customer-intelligence-segmentation/
+│
+├── android-app/
+│   └── CustomerIntelligence/
+│       ├── app/
+│       ├── gradle/
+│       ├── build.gradle.kts
+│       ├── gradle.properties
+│       ├── gradlew
+│       ├── gradlew.bat
+│       └── settings.gradle.kts
+│
+├── backend/
+│   ├── main.py
+│   └── schemas.py
+│
+├── data/
+│   └── raw/
+│
+├── models/
+│   ├── kmeans_model.joblib
+│   └── scaler.joblib
+│
+├── notebooks/
+│   └── customer_segmentation.ipynb
+│
+├── web-app/
+│   └── app.py
+│
+├── .gitignore
+├── README.md
+└── requirements.txt
+```
 
-## Screenshots
+---
 
-Screenshots have not been added to the repository yet.
+# 📱 Android Application
 
-### Streamlit Web App
+### Architecture
 
-_Placeholder — add a Streamlit screenshot when available._
+```text
+User Input
+    ↓
+Jetpack Compose UI
+    ↓
+Customer RFM Data
+    ↓
+Retrofit / HTTP
+    ↓
+AWS FastAPI /predict
+    ↓
+Prediction Response
+    ↓
+Segment + Insights
+```
 
-### Android App
+```text
+Application Name: Customer Intelligence
+Package: com.sangamgupta.customerintelligence
+Version: 1.0.0
+```
 
-_Placeholder — add a screenshot of the Android prediction screen when available._
+---
 
-### Customer Segment Result
+# 🚀 Getting Started
 
-_Placeholder — add a prediction result screenshot when available._
+## 1. Clone
 
-### Settings/About
+```bash
+git clone https://github.com/TheSangamX/customer-intelligence-segmentation.git
+cd customer-intelligence-segmentation
+```
 
-_Placeholder — add a screenshot of the Android Settings/About screen when available._
+## 2. Virtual Environment
 
-## Future improvements
+### Windows
 
-The following are possible future work and are not implemented in this repository:
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
 
-- Deploy the API to a hosted environment and configure clients to use it over HTTPS.
-- Create and document a signed Android release build.
-- Add further customer analytics and dashboard views.
-- Add automated validation and API integration coverage.
+### Linux / macOS
 
-## Author
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+## 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## 4. Start FastAPI
+
+```bash
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+Swagger:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## 5. Run Streamlit
+
+```bash
+streamlit run web-app/app.py
+```
+
+For the deployed web application, Streamlit communicates with the AWS-hosted FastAPI backend.
+
+## 6. Run Android
+
+1. Open the Android project in Android Studio.
+2. Allow Gradle synchronization to complete.
+3. Ensure the required Android SDK is installed.
+4. Connect a device or start an emulator.
+5. Build and run the application.
+6. Use the deployed API base URL for cloud testing.
+
+---
+
+# ☁️ Deployment
+
+The FastAPI backend was deployed on an **AWS EC2 Ubuntu server**.
+
+Deployment included:
+
+1. EC2 instance setup.
+2. Security group configuration.
+3. SSH access.
+4. Git repository cloning.
+5. Python virtual environment creation.
+6. Dependency installation.
+7. Uvicorn/FastAPI setup.
+8. Swagger/OpenAPI testing.
+9. `systemd` service configuration.
+10. Automatic service startup using `systemctl enable`.
+11. Port `8000` network access.
+12. Streamlit connection to the AWS API.
+13. Android connection to the same AWS API.
+
+### Deployment Architecture
+
+```text
+GitHub Repository
+       ↓
+AWS EC2
+       ↓
+Ubuntu Server
+       ↓
+Python Virtual Environment
+       ↓
+FastAPI + Uvicorn
+       ↓
+systemd
+       ↓
+K-Means Artifacts
+       ↓
+ ┌─────┴─────┐
+ ↓           ↓
+Streamlit   Android
+```
+
+---
+
+# 🔒 Current Deployment Notes
+
+The current backend is exposed through:
+
+```text
+http://3.110.155.47:8000
+```
+
+This is suitable for the current learning/deployment setup. For production hardening, consider:
+
+- HTTPS
+- Custom domain
+- API authentication
+- Nginx reverse proxy
+- Rate limiting
+- Restricted network access
+- Monitoring and logging
+- Stable public IP / Elastic IP
+
+---
+
+# 📊 Project Status
+
+## Completed
+
+- [x] Transaction dataset
+- [x] Exploratory Data Analysis
+- [x] Missing-value handling
+- [x] Duplicate detection and removal
+- [x] Data cleaning
+- [x] RFM feature engineering
+- [x] Feature scaling
+- [x] K-Means clustering
+- [x] Elbow/knee analysis
+- [x] KneeLocator
+- [x] Silhouette Score evaluation
+- [x] Hierarchical Clustering comparison
+- [x] Dendrogram analysis
+- [x] DBSCAN analysis
+- [x] Noise/outlier analysis
+- [x] PCA analysis
+- [x] Business segment interpretation
+- [x] Saved ML artifacts
+- [x] FastAPI REST API
+- [x] Pydantic schema
+- [x] `/predict` endpoint
+- [x] Swagger/OpenAPI testing
+- [x] AWS EC2 deployment
+- [x] Uvicorn server
+- [x] systemd backend service
+- [x] Automatic service startup
+- [x] Streamlit web application
+- [x] Streamlit deployment
+- [x] Native Android application
+- [x] Kotlin + Jetpack Compose UI
+- [x] API integration
+- [x] Prediction flow
+- [x] Segment insights
+- [x] Business recommendation
+- [x] Settings screen
+- [x] Dark Mode
+- [x] GitHub repository
+
+---
+
+# 🔮 Future Improvements
+
+These are possible future improvements and are not claimed as currently implemented:
+
+- HTTPS-secured API
+- Custom backend domain
+- API authentication
+- Nginx reverse proxy
+- API rate limiting
+- Production monitoring and logging
+- Automated CI/CD
+- Expanded automated testing
+- Model versioning
+- Automated retraining
+- Prediction history
+- Customer analytics dashboard
+- Interactive cluster visualization
+- Retention/churn analysis
+- More advanced recommendation strategies
+
+---
+
+# ⚠️ Disclaimer
+
+This project generates **customer segments based on RFM behavior and an unsupervised machine learning model**.
+
+The generated segment is an analytical representation of customer behavior and is not a guarantee of future customer actions. Business decisions should consider additional customer context, domain knowledge, and updated transaction data.
+
+This project is intended for:
+
+- Educational purposes
+- Machine learning practice
+- Unsupervised learning practice
+- Customer analytics
+- API development practice
+- Cloud deployment learning
+- Full-stack ML application development
+
+---
+
+# ⭐ What This Project Demonstrates
+
+This project demonstrates how an unsupervised machine learning workflow can move beyond a Jupyter Notebook and become part of a complete application ecosystem.
+
+```text
+Transaction Dataset
+        ↓
+EDA
+        ↓
+Data Cleaning
+        ↓
+RFM Analysis
+        ↓
+Feature Scaling
+        ↓
+K-Means
+        ↓
+Cluster Evaluation
+        ↓
+Business Interpretation
+        ↓
+Saved ML Artifacts
+        ↓
+FastAPI
+        ↓
+AWS EC2
+        ↓
+Streamlit Web App
+        +
+Native Android App
+```
+
+The same central prediction service is consumed by multiple client applications, demonstrating the transition from **machine learning experimentation to a deployed end-to-end ML application**.
+
+---
+
+# 👨‍💻 Developer
 
 **Sangam Gupta**
 
-Email: [contact@sangamgupta.in](mailto:contact@sangamgupta.in)
+- 🌐 Website: https://sangamgupta.in
+- 📧 Email: contact@sangamgupta.in
+- 💻 GitHub: https://github.com/TheSangamX
 
-Website: [sangamgupta.in](https://sangamgupta.in)
+---
 
-## License
+## ⭐ If you found this project interesting
 
-No license file is currently included. A license can be added when the project’s distribution terms are decided.
+Consider giving the repository a star. It documents the complete journey from **customer transaction data and unsupervised machine learning to FastAPI, AWS deployment, Streamlit, and Android integration**.
