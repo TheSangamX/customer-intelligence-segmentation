@@ -22,6 +22,23 @@ The project also compares multiple clustering approaches:
 - Hierarchical Clustering
 - DBSCAN
 
+## Android app and API connection
+
+Start the FastAPI server from the project root so it accepts connections from an Android device:
+
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+The Android app defaults to this PC's current Wi-Fi address, `http://192.168.0.112:8000/`, for physical-phone testing. If the PC's address changes, rebuild with its current LAN IPv4 address. For the Android Emulator, use its host alias instead:
+
+```bash
+cd android-app
+./gradlew assembleDebug -PAPI_BASE_URL=http://10.0.2.2:8000/
+```
+
+For a physical phone, both devices must be on the same network and Windows Firewall must allow inbound connections to port 8000 on the private network. Set `API_BASE_URL` to the PC's current LAN address if it changes.
+
 PCA is used for dimensionality reduction and visualization.
 
 ---

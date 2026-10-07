@@ -48,3 +48,18 @@ android-app/app/build/
 android-app/.idea/
 android-app/local.properties
 android-app/*.iml
+
+
+# Android / Gradle
+.gradle/
+.gradle-user/
+**/.gradle/
+**/.gradle-user/
+
+# Build files
+build/
+**/build/
+
+# Android Studio
+.idea/
+*.iml
