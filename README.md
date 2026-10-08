@@ -1,6 +1,4 @@
-from pathlib import Path
-
-readme = # 🧠 Customer Intelligence & Segmentation
+# 🧠 Customer Intelligence & Segmentation
 
 > An end-to-end unsupervised machine learning application that analyzes customer behavior using RFM analysis and K-Means clustering, then delivers customer segmentation through FastAPI, Streamlit, and a native Android application.
 
@@ -390,19 +388,19 @@ Relatively low purchasing activity and/or lower monetary value.
 ### RFM Input
 
 <p align="center">
-  <img src="assets/s1.jpg" alt="Android RFM Input" width="280">
+  <img src="assets/s1.jpg" alt="Android RFM Input" width="240">
 </p>
 
 ### Customer Segment Result
 
 <p align="center">
-  <img src="assets/s2.jpg" alt="Android Customer Segment Result" width="280">
+  <img src="assets/s2.jpg" alt="Android Customer Segment Result" width="240">
 </p>
 
 ### Settings
 
 <p align="center">
-  <img src="assets/s3.jpg" alt="Android Settings" width="280">
+  <img src="assets/s3.jpg" alt="Android Settings" width="240">
 </p>
 
 ## 🌐 Streamlit Web Application
@@ -870,5 +868,3 @@ The same central prediction service is consumed by multiple client applications,
 <p align="center">
   ⭐ If you found this project interesting, consider giving the repository a star.
 </p>
-
-
